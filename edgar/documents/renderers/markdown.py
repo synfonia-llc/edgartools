@@ -289,10 +289,13 @@ class MarkdownRenderer:
                                     for header in filtered_headers]
             row_md = "| " + " | ".join(filtered_headers) + " |"
             rows.append(row_md)
+        else:
+            # Markdown requires a header row; keep every source row as data.
+            rows.append("| " + " | ".join([""] * len(content_columns)) + " |")
 
-            # Add separator
-            separator = "| " + " | ".join(["---"] * len(filtered_headers)) + " |"
-            rows.append(separator)
+        # Add separator
+        separator = "| " + " | ".join(["---"] * len(content_columns)) + " |"
+        rows.append(separator)
 
         # Render data rows
         for expanded_row in expanded_data_rows:

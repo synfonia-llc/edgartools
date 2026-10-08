@@ -1,0 +1,19 @@
+{
+  "source_url": "https://www.sec.gov/Archives/edgar/data/1572694/000119312526077458/gsbd-20251231.htm",
+  "accession": "0001193125-26-077458",
+  "company": "Goldman Sachs BDC, Inc.",
+  "form": "10-K",
+  "fiscal_year": 2025,
+  "table_index_zero_based": 10,
+  "fixture": "gsbd-20251231-table-10-excerpt.html",
+  "source_representation": "A table DOM serialization captured from the primary HTML; not an original primary-document byte slice.",
+  "extraction": "Retain the table opening and initial five physical rows through the 2025 Fourth Quarter row, then retain the serialized table closing tag. All retained row bytes and attributes are unchanged. Later quarters are omitted.",
+  "ground_truth": {
+    "quarter": "Fourth Quarter 2025",
+    "nav_usd_per_share": "12.64",
+    "closing_sales_price_high_usd": "10.14",
+    "closing_sales_price_low_usd": "9.28",
+    "declared_distribution_usd_per_share": "0.36"
+  },
+  "scope": "Pins a headerless renderer witness and NAV retention. Visual-header classification and multiline body-cell rendering are separate reported issues."
+}

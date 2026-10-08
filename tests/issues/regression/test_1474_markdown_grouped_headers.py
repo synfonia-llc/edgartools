@@ -378,13 +378,17 @@ def test_single_header_row_retains_original_markdown_bytes(header_html, data_htm
     [
         (
             '<tr><td colspan="2">Cloud   team</td><td>10</td><td>8</td></tr><tr><td>Other</td><td>3</td><td>4</td><td>5</td></tr>',
-            "| Cloud team |  | 10 | 8 |\n| Other | 3 | 4 | 5 |",
+            "|  |  |  |  |\n| --- | --- | --- | --- |\n| Cloud team |  | 10 | 8 |\n| Other | 3 | 4 | 5 |",
         ),
-        ('<tr><td>Cloud</td><td colspan="2">10</td></tr><tr><td>Other</td><td>3</td><td>4</td></tr>', "| Cloud | 10 |  |\n| Other | 3 | 4 |"),
+        (
+            '<tr><td>Cloud</td><td colspan="2">10</td></tr><tr><td>Other</td><td>3</td><td>4</td></tr>',
+            "|  |  |  |\n| --- | --- | --- |\n| Cloud | 10 |  |\n| Other | 3 | 4 |",
+        ),
     ],
     ids=["headerless-span-and-whitespace", "headerless-ragged-spans"],
 )
-def test_headerless_spans_and_spacing_retain_original_markdown_bytes(source, expected):
+def test_headerless_spans_and_spacing_preserve_body_bytes_under_a_blank_header(source, expected):
+    """Preserve body expansion while adding a blank Markdown header (GH #1484)."""
     document = parse_document(f"<html><body><table>{source}</table></body></html>")
     assert first_table(document).headers == []
     assert document.to_markdown() == expected
