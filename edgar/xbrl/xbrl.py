@@ -1546,6 +1546,141 @@ class XBRL:
 
         return valid_members
 
+    @staticmethod
+    def _statement_qname_key(name: str) -> str:
+        """Compare the colon/underscore QName forms used by the parser."""
+        return name.replace(":", "_", 1)
+
+    def _statement_entity_nodes(self, tree) -> Optional[Dict[str, Any]]:
+        """Normalize this role's nodes, rejecting conflicting aliases."""
+        nodes = {}
+        for element_id, node in tree.all_nodes.items():
+            key = self._statement_qname_key(element_id)
+            if key in nodes and nodes[key] is not node:
+                return None
+            nodes[key] = node
+        return nodes
+
+    def _statement_entity_children(self, nodes, element_id) -> List[str]:
+        node = nodes.get(element_id)
+        return [self._statement_qname_key(child) for child in node.children] if node else []
+
+    def _statement_entity_role_allows_binding(self, tree) -> bool:
+        """Veto explicit non-statement metadata without guessing from names."""
+        category = self._filing_summary_categories.get(tree.role_uri)
+        if category and category != "statement":
+            return False
+        definition = (tree.definition or "").lower()
+        if _names_notes_section(definition):
+            return False
+        non_statement_categories = {"disclosure", "note", "notes", "document", "details", "table", "tables"}
+        return not any(part.strip() in non_statement_categories for part in definition.split(" - "))
+
+    def _statement_entity_table_member(self, nodes) -> Optional[str]:
+        """Require the demonstrated simple table and one explicit leaf member."""
+        children = self._statement_entity_children
+        table_id = "us-gaap_StatementTable"
+        axis_id = "dei_LegalEntityAxis"
+        domain_id = "dei_EntityDomain"
+        items_id = "us-gaap_StatementLineItems"
+
+        def has_simple_table():
+            table_children = children(nodes, table_id)
+            return (
+                table_id in nodes
+                and table_children.count(axis_id) == 1
+                and table_children.count(items_id) == 1
+                and all(child == items_id or child.endswith("Axis") for child in table_children)
+            )
+
+        if not has_simple_table():
+            return None
+        if children(nodes, axis_id) != [domain_id]:
+            return None
+        members = children(nodes, domain_id)
+        if len(members) != 1:
+            return None
+        member_id = members[0]
+        if member_id not in nodes or children(nodes, member_id) or member_id.endswith(("Axis", "Domain", "Table", "LineItems", "Abstract")):
+            return None
+        axis_element = self.element_catalog.get(axis_id)
+        if axis_element and axis_element.typed_domain_ref:
+            return None
+        return member_id
+
+    def _statement_entity_roots_are_bound(self, tree, nodes) -> bool:
+        """Check every face root and forward edge within its simple scope."""
+        qname = self._statement_qname_key
+        children = self._statement_entity_children
+        definition = (tree.definition or "").lower()
+        roots = [qname(root) for root in tree.root_element_ids]
+        face_roots = {
+            qname(statement_to_concepts[kind].concept)
+            for kind in ("BalanceSheet", "IncomeStatement", "CashFlowStatement", "StatementOfEquity", "ComprehensiveIncome")
+        }
+        table_id = "us-gaap_StatementTable"
+        axis_id = "dei_LegalEntityAxis"
+        domain_id = "dei_EntityDomain"
+
+        def valid_scope_position(element_id, path):
+            if element_id.endswith("Table") and element_id != table_id:
+                return False
+            if element_id.endswith("LegalEntityAxis") and element_id != axis_id:
+                return False
+            if element_id == axis_id:
+                return len(path) == 2 and table_id in path
+            if element_id == domain_id:
+                return len(path) == 3 and axis_id in path
+            return True
+
+        def complete_scope(element_id, path):
+            # Shared node parent/depth values do not describe every occurrence.
+            if element_id not in nodes or element_id in path or not valid_scope_position(element_id, path):
+                return False
+            current_path = path | {element_id}
+            return all(complete_scope(child, current_path) for child in children(nodes, element_id))
+
+        return bool(roots) and all(
+            root in face_roots and not _declares_disclosure(definition, root) and children(nodes, root) == [table_id] and complete_scope(root, set())
+            for root in roots
+        )
+
+    def _get_statement_entity_binding(self, tree) -> Optional[Tuple[str, str]]:
+        """Bind only a complete, simple face role to one explicit entity."""
+        if not self._statement_entity_role_allows_binding(tree):
+            return None
+        nodes = self._statement_entity_nodes(tree)
+        if nodes is None:
+            return None
+        member_id = self._statement_entity_table_member(nodes)
+        if member_id is None or not self._statement_entity_roots_are_bound(tree, nodes):
+            return None
+        return "dei_LegalEntityAxis", member_id
+
+    def _project_statement_entity_facts(self, facts: Dict[str, Any], binding: Tuple[str, str]) -> Dict[str, Any]:
+        """Select an entity and consume only its axis in fresh local wrappers."""
+        qname = self._statement_qname_key
+        axis_id, member_id = binding
+
+        def member_matches(context_id):
+            context = self.contexts.get(context_id)
+            if context is None:
+                return False
+            members = [qname(member) for axis, member in context.dimensions.items() if qname(axis) == axis_id]
+            return bool(members) and all(member == member_id for member in members)
+
+        projected = {}
+        for context_id, wrapped_fact in facts.items():
+            if not member_matches(context_id):
+                continue
+            residual = [dict(info) for info in wrapped_fact["dimension_info"] if qname(info["dimension"]) != axis_id]
+            projected[context_id] = {
+                **wrapped_fact,
+                "dimension_info": residual,
+                "dimension_key": ", ".join(sorted(info["format_key"] for info in residual)),
+            }
+        return projected
+
     def get_statement(self, role_or_type: str,
                       period_filter: Optional[str] = None,
                       should_display_dimensions: Optional[bool] = None,
@@ -1578,6 +1713,7 @@ class XBRL:
             return []
 
         tree = self.presentation_trees[found_role]
+        statement_entity = self._get_statement_entity_binding(tree)
 
         # If should_display_dimensions wasn't provided, default to True
         # Issue #504: Always include dimensional data by default - users can filter themselves if needed
@@ -1598,7 +1734,8 @@ class XBRL:
         for root_id in tree.root_element_ids:
             self._generate_line_items(root_id, tree.all_nodes, line_items, period_filter, None,
                                       should_display_dimensions, valid_dimensional_members, view,
-                                      statement_role=found_role)
+                                      statement_role=found_role,
+                                      statement_entity=statement_entity)
 
         # Apply revenue deduplication for income statements to fix Issue #438
         if actual_statement_type == 'IncomeStatement':
@@ -1665,7 +1802,8 @@ class XBRL:
                              valid_dimensional_members: Optional[Dict[str, Set[str]]] = None,
                              view: Optional['StatementView'] = None,
                              statement_role: Optional[str] = None,
-                             preferred_label_override: Optional[str] = None) -> None:
+                             preferred_label_override: Optional[str] = None,
+                             statement_entity: Optional[Tuple[str, str]] = None) -> None:
         """
         Recursively generate line items for a statement.
 
@@ -1786,6 +1924,9 @@ class XBRL:
 
         # Find facts for any of these concept names
         all_relevant_facts = self._find_facts_for_element(node.element_name, period_filter)
+        if statement_entity is not None:
+            all_relevant_facts = self._project_statement_entity_facts(
+                all_relevant_facts, statement_entity)
 
         # Group facts by period for better selection
         facts_by_period = {}
@@ -2165,7 +2306,8 @@ class XBRL:
             self._generate_line_items(child_id, nodes, result, period_filter, current_path,
                                       should_display_dimensions, valid_dimensional_members, view,
                                       statement_role=statement_role,
-                                      preferred_label_override=child_override)
+                                      preferred_label_override=child_override,
+                                      statement_entity=statement_entity)
 
     def _apply_member_hierarchy(self, dim_items: List[Dict[str, Any]]) -> None:
         """Adjust level of dimensional items based on definition linkbase member hierarchy.

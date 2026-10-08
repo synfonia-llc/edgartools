@@ -1,0 +1,250 @@
+{
+  "source_commit_for_design": "7a2a157e34e0329b1a8428127dd6ab1b985813fe",
+  "builder_policy": "Original byte fragments; no product execution; no prior-year duration columns.",
+  "filings": {
+    "0000006201-26-000052": {
+      "directory": "aal_q2_2026",
+      "fact_count": 534,
+      "context_count": 92,
+      "unit_count": 3,
+      "role_count": 14,
+      "oracle_anchor_count": 44,
+      "roles": {
+        "http://www.aa.com/role/CondensedConsolidatedBalanceSheetsAmericanAirlinesGroupInc": {
+          "kind": "BalanceSheet",
+          "scope": "parent",
+          "retained_fact_instances": 51,
+          "unique_concept_context_pairs": 46,
+          "nil_fact_instances": 1,
+          "residual_dimension_fact_instances": 8
+        },
+        "http://www.aa.com/role/CondensedConsolidatedStatementsofOperationsAmericanAirlinesGroupInc": {
+          "kind": "Operations",
+          "scope": "parent",
+          "retained_fact_instances": 48,
+          "unique_concept_context_pairs": 34,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 14
+        },
+        "http://www.aa.com/role/CondensedConsolidatedStatementsofCashFlowsAmericanAirlinesGroupInc": {
+          "kind": "CashFlows",
+          "scope": "parent",
+          "retained_fact_instances": 19,
+          "unique_concept_context_pairs": 19,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 0
+        },
+        "http://www.aa.com/role/CondensedConsolidatedStatementsofComprehensiveIncomeLossAmericanAirlinesGroupInc": {
+          "kind": "ComprehensiveIncome",
+          "scope": "parent",
+          "retained_fact_instances": 19,
+          "unique_concept_context_pairs": 12,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 2
+        },
+        "http://www.aa.com/role/CondensedConsolidatedStatementsofStockholdersDeficitAmericanAirlinesGroupInc": {
+          "kind": "Equity",
+          "scope": "parent",
+          "retained_fact_instances": 19,
+          "unique_concept_context_pairs": 13,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 9
+        },
+        "http://www.aa.com/role/CondensedConsolidatedBalanceSheetsAmericanAirlinesGroupIncParenthetical": {
+          "kind": "BalanceSheetParenthetical",
+          "scope": "parent",
+          "retained_fact_instances": 5,
+          "unique_concept_context_pairs": 5,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 0
+        },
+        "http://www.aa.com/role/CondensedConsolidatedStatementsofCashFlowsAmericanAirlinesGroupIncParenthetical": {
+          "kind": "CashFlowsParenthetical",
+          "scope": "parent",
+          "retained_fact_instances": 5,
+          "unique_concept_context_pairs": 3,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 0
+        },
+        "http://www.aa.com/role/CondensedConsolidatedBalanceSheetsAmericanAirlinesInc": {
+          "kind": "BalanceSheet",
+          "scope": "subsidiary",
+          "retained_fact_instances": 52,
+          "unique_concept_context_pairs": 47,
+          "nil_fact_instances": 1,
+          "residual_dimension_fact_instances": 8
+        },
+        "http://www.aa.com/role/CondensedConsolidatedStatementsofOperationsAmericanAirlinesInc": {
+          "kind": "Operations",
+          "scope": "subsidiary",
+          "retained_fact_instances": 38,
+          "unique_concept_context_pairs": 30,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 14
+        },
+        "http://www.aa.com/role/CondensedConsolidatedStatementsofCashFlowsAmericanAirlinesInc": {
+          "kind": "CashFlows",
+          "scope": "subsidiary",
+          "retained_fact_instances": 19,
+          "unique_concept_context_pairs": 19,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 0
+        },
+        "http://www.aa.com/role/CondensedConsolidatedStatementsofComprehensiveIncomeLossAmericanAirlinesInc": {
+          "kind": "ComprehensiveIncome",
+          "scope": "subsidiary",
+          "retained_fact_instances": 17,
+          "unique_concept_context_pairs": 12,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 2
+        },
+        "http://www.aa.com/role/CondensedConsolidatedStatementsofStockholdersEquityAmericanAirlinesInc": {
+          "kind": "Equity",
+          "scope": "subsidiary",
+          "retained_fact_instances": 16,
+          "unique_concept_context_pairs": 11,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 8
+        },
+        "http://www.aa.com/role/CondensedConsolidatedBalanceSheetsAmericanAirlinesIncParenthetical": {
+          "kind": "BalanceSheetParenthetical",
+          "scope": "subsidiary",
+          "retained_fact_instances": 5,
+          "unique_concept_context_pairs": 5,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 0
+        },
+        "http://www.aa.com/role/CondensedConsolidatedStatementsofCashFlowsAmericanAirlinesIncParenthetical": {
+          "kind": "CashFlowsParenthetical",
+          "scope": "subsidiary",
+          "retained_fact_instances": 5,
+          "unique_concept_context_pairs": 3,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 0
+        }
+      }
+    },
+    "0000006201-26-000014": {
+      "directory": "aal_fy2025",
+      "fact_count": 503,
+      "context_count": 62,
+      "unit_count": 4,
+      "role_count": 14,
+      "oracle_anchor_count": 41,
+      "roles": {
+        "http://www.aa.com/role/ConsolidatedBalanceSheetsAmericanAirlinesGroupInc": {
+          "kind": "BalanceSheet",
+          "scope": "parent",
+          "retained_fact_instances": 57,
+          "unique_concept_context_pairs": 45,
+          "nil_fact_instances": 1,
+          "residual_dimension_fact_instances": 8
+        },
+        "http://www.aa.com/role/ConsolidatedStatementsofOperationsAmericanAirlinesGroupInc": {
+          "kind": "Operations",
+          "scope": "parent",
+          "retained_fact_instances": 52,
+          "unique_concept_context_pairs": 34,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 14
+        },
+        "http://www.aa.com/role/ConsolidatedStatementsofCashFlowsAmericanAirlinesGroupInc": {
+          "kind": "CashFlows",
+          "scope": "parent",
+          "retained_fact_instances": 35,
+          "unique_concept_context_pairs": 29,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 3
+        },
+        "http://www.aa.com/role/ConsolidatedStatementsofComprehensiveIncomeAmericanAirlinesGroupInc": {
+          "kind": "ComprehensiveIncome",
+          "scope": "parent",
+          "retained_fact_instances": 14,
+          "unique_concept_context_pairs": 7,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 2
+        },
+        "http://www.aa.com/role/ConsolidatedStatementsofStockholdersDeficitAmericanAirlinesGroupInc": {
+          "kind": "Equity",
+          "scope": "parent",
+          "retained_fact_instances": 24,
+          "unique_concept_context_pairs": 15,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 10
+        },
+        "http://www.aa.com/role/ConsolidatedBalanceSheetsAmericanAirlinesGroupIncParenthetical": {
+          "kind": "BalanceSheetParenthetical",
+          "scope": "parent",
+          "retained_fact_instances": 5,
+          "unique_concept_context_pairs": 5,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 0
+        },
+        "http://www.aa.com/role/ConsolidatedStatementsofCashFlowsAmericanAirlinesGroupIncParenthetical": {
+          "kind": "CashFlowsParenthetical",
+          "scope": "parent",
+          "retained_fact_instances": 5,
+          "unique_concept_context_pairs": 3,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 0
+        },
+        "http://www.aa.com/role/ConsolidatedBalanceSheetsAmericanAirlinesInc": {
+          "kind": "BalanceSheet",
+          "scope": "subsidiary",
+          "retained_fact_instances": 59,
+          "unique_concept_context_pairs": 46,
+          "nil_fact_instances": 1,
+          "residual_dimension_fact_instances": 8
+        },
+        "http://www.aa.com/role/ConsolidatedStatementsofOperationsAmericanAirlinesInc": {
+          "kind": "Operations",
+          "scope": "subsidiary",
+          "retained_fact_instances": 41,
+          "unique_concept_context_pairs": 30,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 14
+        },
+        "http://www.aa.com/role/ConsolidatedStatementsofCashFlowsAmericanAirlinesInc": {
+          "kind": "CashFlows",
+          "scope": "subsidiary",
+          "retained_fact_instances": 34,
+          "unique_concept_context_pairs": 30,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 3
+        },
+        "http://www.aa.com/role/ConsolidatedStatementsofComprehensiveIncomeAmericanAirlinesInc": {
+          "kind": "ComprehensiveIncome",
+          "scope": "subsidiary",
+          "retained_fact_instances": 12,
+          "unique_concept_context_pairs": 7,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 2
+        },
+        "http://www.aa.com/role/ConsolidatedStatementsofStockholdersEquityAmericanAirlinesInc": {
+          "kind": "Equity",
+          "scope": "subsidiary",
+          "retained_fact_instances": 20,
+          "unique_concept_context_pairs": 13,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 9
+        },
+        "http://www.aa.com/role/ConsolidatedBalanceSheetsAmericanAirlinesIncParenthetical": {
+          "kind": "BalanceSheetParenthetical",
+          "scope": "subsidiary",
+          "retained_fact_instances": 6,
+          "unique_concept_context_pairs": 5,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 0
+        },
+        "http://www.aa.com/role/ConsolidatedStatementsofCashFlowsAmericanAirlinesIncParenthetical": {
+          "kind": "CashFlowsParenthetical",
+          "scope": "subsidiary",
+          "retained_fact_instances": 5,
+          "unique_concept_context_pairs": 3,
+          "nil_fact_instances": 0,
+          "residual_dimension_fact_instances": 0
+        }
+      }
+    }
+  }
+}

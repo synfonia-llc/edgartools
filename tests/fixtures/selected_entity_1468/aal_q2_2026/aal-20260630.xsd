@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--XBRL Document Created with the Workiva Platform-->
+<!--Copyright 2026 Workiva-->
+<!--r:019e4ae1-70f4-7c6f-a453-59fcbd0c5c9f,g:89ba44d6-c53c-476b-8f35-63eb5c0e0c6f-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:link="http://www.xbrl.org/2003/linkbase" xmlns:aal="http://www.aa.com/20260630" xmlns:xbrli="http://www.xbrl.org/2003/instance" xmlns:dtr-types="http://www.xbrl.org/dtr/type/2024-01-31" xmlns:xbrldt="http://xbrl.org/2005/xbrldt" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.aa.com/20260630">
+<xs:import namespace="http://fasb.org/srt/2026" schemaLocation="https://xbrl.fasb.org/srt/2026/elts/srt-2026.xsd"/>
+<xs:import namespace="http://fasb.org/us-gaap/2026" schemaLocation="https://xbrl.fasb.org/us-gaap/2026/elts/us-gaap-2026.xsd"/>
+<xs:import namespace="http://www.xbrl.org/2003/instance" schemaLocation="http://www.xbrl.org/2003/xbrl-instance-2003-12-31.xsd"/>
+<xs:import namespace="http://www.xbrl.org/2003/linkbase" schemaLocation="http://www.xbrl.org/2003/xbrl-linkbase-2003-12-31.xsd"/>
+<xs:import namespace="http://www.xbrl.org/dtr/type/2024-01-31" schemaLocation="https://www.xbrl.org/dtr/type/2024-01-31/types.xsd"/>
+<xs:import namespace="http://xbrl.org/2005/xbrldt" schemaLocation="http://www.xbrl.org/2005/xbrldt-2005.xsd"/>
+<xs:import namespace="http://xbrl.sec.gov/dei/2026" schemaLocation="https://xbrl.sec.gov/dei/2026/dei-2026.xsd"/>
+<xs:import namespace="http://xbrl.sec.gov/ecd/2026" schemaLocation="https://xbrl.sec.gov/ecd/2026/ecd-2026.xsd"/>
+<xs:annotation>
+<xs:appinfo>
+<link:roleType id="CondensedConsolidatedStatementsofOperationsAmericanAirlinesGroupInc" roleURI="http://www.aa.com/role/CondensedConsolidatedStatementsofOperationsAmericanAirlinesGroupInc">
+        <link:definition>9952151 - Statement - Condensed Consolidated Statements of Operations - American Airlines Group Inc.</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+<link:roleType id="CondensedConsolidatedStatementsofOperationsAmericanAirlinesInc" roleURI="http://www.aa.com/role/CondensedConsolidatedStatementsofOperationsAmericanAirlinesInc">
+        <link:definition>9952152 - Statement - Condensed Consolidated Statements of Operations - American Airlines, Inc.</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+<link:roleType id="CondensedConsolidatedStatementsofComprehensiveIncomeLossAmericanAirlinesGroupInc" roleURI="http://www.aa.com/role/CondensedConsolidatedStatementsofComprehensiveIncomeLossAmericanAirlinesGroupInc">
+        <link:definition>9952153 - Statement - Condensed Consolidated Statements of Comprehensive Income (Loss) - American Airlines Group Inc.</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+<link:roleType id="CondensedConsolidatedStatementsofComprehensiveIncomeLossAmericanAirlinesInc" roleURI="http://www.aa.com/role/CondensedConsolidatedStatementsofComprehensiveIncomeLossAmericanAirlinesInc">
+        <link:definition>9952154 - Statement - Condensed Consolidated Statements of Comprehensive Income (Loss) - American Airlines, Inc.</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+<link:roleType id="CondensedConsolidatedBalanceSheetsAmericanAirlinesGroupInc" roleURI="http://www.aa.com/role/CondensedConsolidatedBalanceSheetsAmericanAirlinesGroupInc">
+        <link:definition>9952155 - Statement - Condensed Consolidated Balance Sheets - American Airlines Group Inc.</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+<link:roleType id="CondensedConsolidatedBalanceSheetsAmericanAirlinesGroupIncParenthetical" roleURI="http://www.aa.com/role/CondensedConsolidatedBalanceSheetsAmericanAirlinesGroupIncParenthetical">
+        <link:definition>9952156 - Statement - Condensed Consolidated Balance Sheets - American Airlines Group Inc. (Parenthetical)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+<link:roleType id="CondensedConsolidatedBalanceSheetsAmericanAirlinesInc" roleURI="http://www.aa.com/role/CondensedConsolidatedBalanceSheetsAmericanAirlinesInc">
+        <link:definition>9952157 - Statement - Condensed Consolidated Balance Sheets - American Airlines, Inc.</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+<link:roleType id="CondensedConsolidatedBalanceSheetsAmericanAirlinesIncParenthetical" roleURI="http://www.aa.com/role/CondensedConsolidatedBalanceSheetsAmericanAirlinesIncParenthetical">
+        <link:definition>9952158 - Statement - Condensed Consolidated Balance Sheets - American Airlines, Inc. (Parenthetical)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+<link:roleType id="CondensedConsolidatedStatementsofCashFlowsAmericanAirlinesGroupInc" roleURI="http://www.aa.com/role/CondensedConsolidatedStatementsofCashFlowsAmericanAirlinesGroupInc">
+        <link:definition>9952159 - Statement - Condensed Consolidated Statements of Cash Flows - American Airlines Group Inc.</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+<link:roleType id="CondensedConsolidatedStatementsofCashFlowsAmericanAirlinesGroupIncParenthetical" roleURI="http://www.aa.com/role/CondensedConsolidatedStatementsofCashFlowsAmericanAirlinesGroupIncParenthetical">
+        <link:definition>9952160 - Statement - Condensed Consolidated Statements of Cash Flows - American Airlines Group Inc. (Parenthetical)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+<link:roleType id="CondensedConsolidatedStatementsofCashFlowsAmericanAirlinesInc" roleURI="http://www.aa.com/role/CondensedConsolidatedStatementsofCashFlowsAmericanAirlinesInc">
+        <link:definition>9952161 - Statement - Condensed Consolidated Statements of Cash Flows - American Airlines, Inc.</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+<link:roleType id="CondensedConsolidatedStatementsofCashFlowsAmericanAirlinesIncParenthetical" roleURI="http://www.aa.com/role/CondensedConsolidatedStatementsofCashFlowsAmericanAirlinesIncParenthetical">
+        <link:definition>9952162 - Statement - Condensed Consolidated Statements of Cash Flows - American Airlines, Inc. (Parenthetical)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+<link:roleType id="CondensedConsolidatedStatementsofStockholdersDeficitAmericanAirlinesGroupInc" roleURI="http://www.aa.com/role/CondensedConsolidatedStatementsofStockholdersDeficitAmericanAirlinesGroupInc">
+        <link:definition>9952163 - Statement - Condensed Consolidated Statements of Stockholders' Deficit - American Airlines Group Inc.</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+<link:roleType id="CondensedConsolidatedStatementsofStockholdersEquityAmericanAirlinesInc" roleURI="http://www.aa.com/role/CondensedConsolidatedStatementsofStockholdersEquityAmericanAirlinesInc">
+        <link:definition>9952165 - Statement - Condensed Consolidated Statements of Stockholder's Equity - American Airlines, Inc.</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+</xs:appinfo>
+</xs:annotation>
+<xs:element id="aal_AmericanAirlinesIncMember" abstract="true" name="AmericanAirlinesIncMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+<xs:element id="aal_RestructuringAndOtherExpenseIncomeMainline" abstract="false" name="RestructuringAndOtherExpenseIncomeMainline" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+<xs:element id="aal_AirTrafficMember" abstract="true" name="AirTrafficMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+<xs:element id="aal_LoyaltyProgramMember" abstract="true" name="LoyaltyProgramMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+<xs:element id="aal_GroundPropertyAndEquipmentGross" abstract="false" name="GroundPropertyAndEquipmentGross" nillable="true" xbrli:periodType="instant" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+<xs:element id="aal_ProceedsFromSaleOfPropertyPlantAndEquipmentAndSaleLeaseBackTransactions" abstract="false" name="ProceedsFromSaleOfPropertyPlantAndEquipmentAndSaleLeaseBackTransactions" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+<xs:element id="aal_NetProceedsPaymentsFromShortTermLoansAndNotesPayable" abstract="false" name="NetProceedsPaymentsFromShortTermLoansAndNotesPayable" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+<xs:element id="aal_OtherSignificantNoncashTransactionFinanceLeaseConversionToOperatingLease" abstract="false" name="OtherSignificantNoncashTransactionFinanceLeaseConversionToOperatingLease" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+<xs:element id="aal_OtherSignificantNoncashTransactionOperatingLeaseConversionToFinanceLease" abstract="false" name="OtherSignificantNoncashTransactionOperatingLeaseConversionToFinanceLease" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+<xs:element id="aal_AdjustmentsToAdditionalPaidInCapitalWarrantSettlement" abstract="false" name="AdjustmentsToAdditionalPaidInCapitalWarrantSettlement" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+<xs:element id="aal_IntercompanyEquityTransfer" abstract="false" name="IntercompanyEquityTransfer" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+<xs:element id="aal_PassengerTravelMember" abstract="true" name="PassengerTravelMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+<xs:element id="aal_LoyaltyProgramTravelRedemptionsMember" abstract="true" name="LoyaltyProgramTravelRedemptionsMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+<xs:element id="aal_LoyaltyProgramMarketingServicesMember" abstract="true" name="LoyaltyProgramMarketingServicesMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+<xs:element id="aal_OtherRevenueMember" abstract="true" name="OtherRevenueMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+</xs:schema>
