@@ -7,6 +7,7 @@ This module provides functions for formatting and displaying XBRL data.
 import math
 from dataclasses import dataclass, field
 from datetime import datetime
+from decimal import Decimal
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
@@ -851,6 +852,11 @@ eps_concepts = [
     'us-gaap_CommonStockParOrStatedValuePerShare',
 ]
 
+par_value_concepts = (
+    'us-gaap_CommonStockParOrStatedValuePerShare',
+    'us-gaap_PreferredStockParOrStatedValuePerShare',
+)
+
 
 def _is_html(text: str) -> bool:
     """
@@ -1430,6 +1436,7 @@ def _format_value_for_display_as_string(
     # Fast check for common share and EPS concepts
     is_share_value = concept in share_concepts
     is_eps_value = concept in eps_concepts
+    is_par_value = concept in par_value_concepts
 
     # Only perform expensive label operations if needed for monetary determination
     is_monetary = is_monetary_statement
@@ -1460,8 +1467,14 @@ def _format_value_for_display_as_string(
 
     # Format numeric values efficiently
     if value_type in (int, float):
+        if is_par_value:
+            if value_type is float and not math.isfinite(value):
+                return str(value)
+            # Par values can be exact at much finer precision than EPS.
+            whole, _, fraction = format(Decimal(str(value)), ',f').partition('.')
+            return f"{whole}.{fraction.ljust(2, '0')}"
         # Handle EPS values with decimal precision
-        if is_eps_value:
+        elif is_eps_value:
             # EPS values should show 2-3 decimal places and not be scaled
             if abs(value) >= 1000:
                 # For very large EPS values, use thousands separator
