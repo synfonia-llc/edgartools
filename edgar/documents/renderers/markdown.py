@@ -282,11 +282,9 @@ class MarkdownRenderer:
             combined_headers = self._combine_multi_row_headers(expanded_headers)
             filtered_headers = [combined_headers[i] if i < len(combined_headers) else "" for i in content_columns]
 
-            # Keep flat-header output compatible, including its existing escape
-            # limitations; escape the newly flattened grouped header paths.
-            if len(node.headers) >= 2:
-                filtered_headers = [header.replace('\\', '\\\\').replace('|', '\\|')
-                                    for header in filtered_headers]
+            # Escape literal backslashes before introducing pipe escapes.
+            filtered_headers = [header.replace('\\', '\\\\').replace('|', '\\|')
+                                for header in filtered_headers]
             row_md = "| " + " | ".join(filtered_headers) + " |"
             rows.append(row_md)
 
