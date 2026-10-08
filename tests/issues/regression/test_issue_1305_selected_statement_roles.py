@@ -351,6 +351,58 @@ def test_apple_parenthetical_keeps_filed_share_and_par_value_instants(apple, sel
     assert [issue.code for issue in validation.issues] == ["NO_VALIDATOR"]
 
 
+@pytest.mark.parametrize("selection", ("named", "typed", "get", "uri", "blank"))
+def test_apple_parenthetical_trends_keep_selected_role_instants(fresh_apple, monkeypatch, selection):
+    """Trend retrieval keeps Apple's parenthetical facts and instant comparison."""
+    apple = fresh_apple
+    if selection == "named":
+        statement = apple.statements.balance_sheet(parenthetical=True)
+    elif selection == "typed":
+        statement = apple.statements["BalanceSheetParenthetical"]
+    elif selection == "get":
+        statement = apple.statements.get("BalanceSheetParenthetical")
+    elif selection == "uri":
+        statement = apple.statements[APPLE_PARENTHETICAL]
+    else:
+        statement = Statement(apple, APPLE_PARENTHETICAL, canonical_type="")
+    assert statement is not None
+    assert statement.role_or_type == APPLE_PARENTHETICAL
+    assert statement.classified_type == "BalanceSheetParenthetical"
+    assert not statement.canonical_type
+
+    requested_kinds = []
+    period_reads = []
+    original_period_views = apple.get_period_views
+    original_raw_data = statement.get_raw_data
+
+    def observe_period_views(statement_type):
+        requested_kinds.append(statement_type)
+        return original_period_views(statement_type)
+
+    def observe_raw_data(period_filter=None, view=None):
+        data = original_raw_data(period_filter=period_filter, view=view)
+        period_reads.append((period_filter, data))
+        return data
+
+    monkeypatch.setattr(apple, "get_period_views", observe_period_views)
+    monkeypatch.setattr(statement, "get_raw_data", observe_raw_data)
+    # A parenthetical has share/par-value facts, not primary asset/income metrics.
+    assert statement.analyze_trends(2) == {}
+    assert requested_kinds == ["BalanceSheetParenthetical"]
+    assert [period for period, _data in period_reads] == ["instant_2023-09-30", "instant_2022-09-24"]
+    for (period, data), shares in zip(period_reads, (15_550_061_000, 15_943_425_000)):
+        rows = {row["concept"]: row for row in data if not row.get("is_abstract") and not row.get("is_dimension")}
+        assert set(rows) == {
+            "us-gaap_CommonStockParOrStatedValuePerShare",
+            "us-gaap_CommonStockSharesAuthorized",
+            "us-gaap_CommonStockSharesIssued",
+            "us-gaap_CommonStockSharesOutstanding",
+        }
+        for concept in ("us-gaap_CommonStockSharesIssued", "us-gaap_CommonStockSharesOutstanding"):
+            assert rows[concept]["values"][period] == shares
+            assert rows[concept]["units"][period] == "shares"
+
+
 def _reset_statement_selection(apple, monkeypatch):
     monkeypatch.setattr(apple, "_statement_resolver", None)
     monkeypatch.setattr(apple, "_all_statements_cached", None)
