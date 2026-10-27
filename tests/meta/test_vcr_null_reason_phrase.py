@@ -1,10 +1,10 @@
-"""Cassettes with no recorded reason phrase must replay on the pinned vcrpy.
+"""Cassettes with no recorded reason phrase must replay on supported vcrpy.
 
 79 of the suite's cassettes store ``message: null`` (they were recorded through
-vcrpy's httpcore stub). vcrpy 8.2+ crashes replaying those until
-kevin1024/vcrpy#1029 is released, so ``tests/_vcr_compat.py`` fills the phrase
-in. These tests replay through a real VCR, the way a cassette-backed test does,
-so they fail if that fix stops being applied.
+vcrpy's httpcore stub). Supported vcrpy 8.3 needs ``tests/_vcr_compat.py`` to
+fill the phrase in; vcrpy 8.4+ handles it upstream. These tests replay through
+a real VCR, the way a cassette-backed test does, and check that installing the
+compatibility fix again preserves working replay in either case.
 """
 import importlib
 import importlib.util
@@ -76,9 +76,11 @@ def test_replay_supplies_the_reason_phrase(replay_only, name, library):
     assert response.text == name
 
 
-def test_the_compat_fix_is_still_needed():
-    """When this fails, the pinned vcrpy handles a null phrase by itself:
-    delete tests/_vcr_compat.py and its call in tests/conftest.py."""
+def test_the_compat_fix_is_idempotent():
+    """Conftest has already configured a deserializer that handles null phrases."""
     from vcr.stubs import httpx_stubs
 
-    assert httpx_stubs._deserialize_response.__module__ == _vcr_compat.__name__
+    current = httpx_stubs._deserialize_response
+    assert _vcr_compat.install_null_reason_phrase_fix() is False
+    assert httpx_stubs._deserialize_response is current
+    assert _vcr_compat._replays_null_phrase(current)

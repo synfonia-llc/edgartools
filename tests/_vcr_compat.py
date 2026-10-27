@@ -1,4 +1,4 @@
-"""Let vcrpy >= 8.2 replay cassettes that store no reason phrase.
+"""Let supported vcrpy replay cassettes that store no reason phrase.
 
 vcrpy 8.2.0 replaced the httpcore-level stub with an httpx-level one, and its
 response deserializer (``vcr/stubs/httpx_stubs.py``) does::
@@ -10,18 +10,22 @@ most responses, so that line raises ``AttributeError: 'NoneType' object has no
 attribute 'encode'``. Measured on 2026-10-03 against vcrpy 8.3.0: 79 of 214
 cassettes carry a null phrase, and 63 cassette-backed tests fail on replay.
 
-The fix is upstream as kevin1024/vcrpy#1029 and unreleased. Until it ships,
-this module fills a missing phrase with the standard one for the status code,
-which is what httpx derived for these cassettes when the httpcore stub left
-``extensions`` unset. A recorded phrase is left alone.
+The fix shipped upstream in vcrpy 8.4 as kevin1024/vcrpy#1029. The supported
+range still includes 8.3, so this module conditionally fills a missing phrase
+with the standard one for the status code, which is what httpx derived for
+these cassettes when the httpcore stub left ``extensions`` unset. A recorded
+phrase is left alone; an upstream deserializer that handles null phrases is
+left unchanged.
 
 vcrpy < 8.3.0 cannot intercept httpx2 at all (requests reach the real network
 and nothing is recorded), so this is also what lets the suite sit on a vcrpy
 that can (beads edgartools-q2iz).
 
-Delete this module, and its call in ``tests/conftest.py``, once the pinned
-vcrpy includes the upstream fix: ``install_null_reason_phrase_fix`` returns
-False in that case, and ``tests/meta/test_vcr_null_reason_phrase.py`` says so.
+Delete this module, and its call in ``tests/conftest.py``, once the minimum
+supported vcrpy includes the upstream fix. Until then,
+``install_null_reason_phrase_fix`` returns False when replay already works,
+and ``tests/meta/test_vcr_null_reason_phrase.py`` checks replay and idempotence
+on both shimmed and upstream-fixed versions.
 """
 from __future__ import annotations
 

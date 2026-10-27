@@ -191,7 +191,7 @@ dependencies = [
   # 8.3.0 is the first vcrpy that can intercept httpx2. Its httpx stub crashes
   # (`'NoneType' object has no attribute 'encode'`) on a cassette with a null
   # reason phrase, which 79 of ours have; tests/_vcr_compat.py carries the fix
-  # until kevin1024/vcrpy#1029 is released.
+  # while 8.3 remains supported (8.4+ includes the upstream fix).
   "vcrpy>=8.3.0,<9",
   "filelock",
   "pyinstrument",

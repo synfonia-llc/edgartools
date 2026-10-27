@@ -19,8 +19,8 @@ from tests.paths import CASSETTES_DIR  # noqa: E402
 
 install_safe_yaml_deserializer()
 
-# vcrpy 8.2+ cannot replay a cassette with a null reason phrase until
-# kevin1024/vcrpy#1029 is released; 79 of ours have one.
+# Supported vcrpy 8.3 needs this for null reason phrases; 8.4+ handles them
+# upstream. Retain the conditional fix while 8.3 remains supported.
 install_null_reason_phrase_fix()
 
 # VCR configuration for recording/replaying HTTP interactions.
