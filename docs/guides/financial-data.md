@@ -308,7 +308,7 @@ print(xbrl.reporting_periods)
 | `financials.get_revenue()` | Revenue value |
 | `financials.get_net_income()` | Net income value |
 | `financials.get_total_assets()` | Total assets value |
-| `financials.get_financial_metrics()` | Dict of all key metrics |
+| `financials.get_financial_metrics()` | Dict of 15 scalar metrics; pass `include_periods=True` for each metric's selected source dates |
 
 ### Statement Object
 

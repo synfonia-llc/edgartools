@@ -73,10 +73,31 @@ patterns:
     when: Comprehensive snapshot
     code: |
       metrics = financials.get_financial_metrics()  # Returns dict with:
-      # revenue, net_income, total_assets, total_liabilities, stockholders_equity,
-      # operating_cash_flow, free_cash_flow, current_assets, current_liabilities,
+      # revenue, operating_income, net_income,
+      # total_assets, total_liabilities, stockholders_equity,
+      # operating_cash_flow, capital_expenditures, free_cash_flow,
+      # current_assets, current_liabilities,
       # shares_outstanding_basic, shares_outstanding_diluted,
-      # current_ratio, debt_to_equity, return_on_equity, profit_margin
+      # current_ratio, debt_to_assets
+
+      # Add exact selected source dates without changing scalar values:
+      metrics = financials.get_financial_metrics(include_periods=True)
+      print(metrics["revenue"], metrics["periods"]["revenue"])
+      print(metrics["operating_cash_flow"], metrics["periods"]["operating_cash_flow"])
+    note: |
+      The default returns 15 numbers or None. The keyword-only include_periods=True option
+      adds a periods mapping with the same 15 names. Each known period has period_type
+      (duration or instant), start_date and end_date as ISO dates; an instant's start_date is None.
+      An unavailable metric has value and period None. Missing, invalid or ambiguous dates
+      leave an available value unchanged and its period None. Numeric zero remains zero.
+      A custom getter's value without an established source period also has period None.
+      Income metrics and weighted-average shares use their selected income duration;
+      balance-sheet metrics use their selected instant; cash-flow metrics use their own duration.
+      Free cash flow is operating_cash_flow - abs(capital_expenditures), with period metadata
+      only when both operands have the same known duration. It can validly be YTD while revenue
+      is quarterly. current_ratio is current assets / current liabilities; debt_to_assets is
+      total liabilities / total assets. Their periods require matching known instants.
+      This option exposes source periods; it does not align or annualize values.
 
   - name: Compare Companies
     when: Side-by-side comparison, revenue trends, multi-company analysis
@@ -95,8 +116,9 @@ patterns:
     note: |
       Use get_X() methods for specific values. Use income_statement()/balance_sheet() for full tables.
       Do NOT use DataFrame indexing like .iloc[0].get("Revenue") on statement objects.
-      Do NOT build manual DataFrames or period-alignment logic.
-      get_financials() handles period alignment automatically.
+      Use get_financial_metrics(include_periods=True) to inspect exact selected dates before
+      comparing values. Equal end dates do not prove equal durations, and unknown periods
+      do not establish a match. Also check entity, currency, units and metric definitions.
 
 avoid:
   - pattern: "financials.income_statement(view='detailed')"
@@ -110,4 +132,4 @@ avoid:
       for ticker in tickers:
           f = Company(ticker).get_financials()
           print(f.get_revenue())
-    why: get_financials() is simpler, handles period alignment, and avoids manual iteration
+    why: get_financials() avoids manual fact iteration; inspect selected source periods with get_financial_metrics(include_periods=True) before comparing values

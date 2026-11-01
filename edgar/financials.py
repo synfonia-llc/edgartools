@@ -123,6 +123,48 @@ def _order_period_columns(rendered, df_period_columns: List[str]) -> List[str]:
     return result
 
 
+def _period_descriptor(rendered, column) -> Optional[Dict[str, Any]]:
+    """Exact dates when every source period for a displayed column agrees."""
+    matches = [p for p in (getattr(rendered, 'periods', None) or [])
+               if _period_column_name(p) == column]
+    if not matches:
+        return None
+
+    selected = None
+    for period in matches:
+        if not isinstance(period.is_duration, bool):
+            return None
+        end = _parse_iso_date(period.end_date)
+        if end is None:
+            return None
+        # None alone denotes an absent start. Nullable/falsey malformed values
+        # must neither raise during a truth test nor become known instants.
+        raw_start = period.start_date
+        if raw_start is not None:
+            start = _parse_iso_date(raw_start)
+            if start is None or start > end:
+                return None
+            candidate = ('duration', start.isoformat(), end.isoformat())
+        else:
+            if period.is_duration:
+                return None
+            candidate = ('instant', None, end.isoformat())
+        if selected is not None and selected != candidate:
+            return None
+        selected = candidate
+
+    return dict(zip(('period_type', 'start_date', 'end_date'), selected, strict=True))
+
+
+def _select_period_column(rendered, df, period_offset: int = 0):
+    """Select the scalar column without evaluating optional period metadata."""
+    columns = _order_period_columns(
+        rendered, [col for col in df.columns if col not in _NON_PERIOD_COLUMNS])
+    if len(columns) <= period_offset:
+        return None
+    return columns[period_offset]
+
+
 class Financials:
     def __init__(self, xb: Optional[XBRL]):
         self.xb: XBRL = xb
@@ -338,13 +380,9 @@ class Financials:
 
             # Get period columns, ordered most-recent-first by period metadata
             # (positional df order is not recency-sorted — GH #885).
-            period_columns = [col for col in df.columns if col not in _NON_PERIOD_COLUMNS]
-            period_columns = _order_period_columns(rendered, period_columns)
-
-            if len(period_columns) <= period_offset:
+            period_col = _select_period_column(rendered, df, period_offset)
+            if period_col is None:
                 return None
-
-            period_col = period_columns[period_offset]
 
             def _strip_ns(name: str) -> str:
                 # Normalize a concept name to its bare local-name for exact comparison.
@@ -436,11 +474,11 @@ class Financials:
             rendered, df = self._render_statement_frame('income')
             if df is None or df.empty:
                 return None
-            period_columns = _order_period_columns(
-                rendered, [col for col in df.columns if col not in _NON_PERIOD_COLUMNS])
-            if len(period_columns) <= period_offset:
+            column = _select_period_column(rendered, df, period_offset)
+            if column is None:
                 return None
-            column = period_columns[period_offset]
+            # Preserve the legacy first-match raw-fact selection even when the
+            # informational descriptor is unknown because display names collide.
             period = next((p for p in rendered.periods if _period_column_name(p) == column), None)
             if period is None or not period.start_date or not period.end_date:
                 return None
@@ -500,11 +538,8 @@ class Financials:
                     # Get available period columns, ordered most-recent-first by
                     # period metadata (positional df order is not recency-sorted
                     # — GH #885).
-                    period_columns = [col for col in df.columns if col not in _NON_PERIOD_COLUMNS]
-                    period_columns = _order_period_columns(rendered, period_columns)
-
-                    if len(period_columns) > period_offset:
-                        period_col = period_columns[period_offset]
+                    period_col = _select_period_column(rendered, df, period_offset)
+                    if period_col is not None:
 
                         # Try each match until we find one with a valid value
                         for idx in range(len(matches)):
@@ -1115,11 +1150,9 @@ class Financials:
             # Get available period columns, ordered most-recent-first by period
             # metadata (positional df order is not recency-sorted — GH #885).
             # Invariant across patterns, so it is resolved once.
-            period_columns = [col for col in df.columns if col not in _NON_PERIOD_COLUMNS]
-            period_columns = _order_period_columns(rendered, period_columns)
-            if len(period_columns) <= period_offset:
+            period_col = _select_period_column(rendered, df, period_offset)
+            if period_col is None:
                 return None
-            period_col = period_columns[period_offset]
 
             # Find the concept using pattern matching on concept column
             for pattern in concept_patterns:
@@ -1226,9 +1259,13 @@ class Financials:
         ]
         return self._get_concept_value('income', concept_patterns, period_offset)
 
-    def get_financial_metrics(self) -> Dict[str, Any]:
+    def get_financial_metrics(self, *, include_periods: bool = False) -> Dict[str, Any]:
         """
         Get a dictionary of common financial metrics using standardized labels.
+
+        Args:
+            include_periods: Add a ``periods`` mapping with each metric's exact
+                selected source dates. False preserves the 15 scalar entries.
 
         Returns:
             Dictionary containing available financial metrics. Two keys are
@@ -1242,11 +1279,24 @@ class Financials:
               borrowings-only ratio, divide the filing's debt concepts by
               ``total_assets``.
 
+            With ``include_periods=True``, each metric also has a descriptor in
+            ``periods``: ``period_type`` (``duration`` or ``instant``),
+            ``start_date`` (ISO date, or None for an instant) and ``end_date``
+            (ISO date). Unavailable metrics and missing, invalid or ambiguous
+            source periods have None metadata; scalar values are unchanged.
+            Custom getters whose source period cannot be established also keep
+            their values with None metadata.
+            Periods are selected independently: quarter income and YTD cash flow
+            can coexist. Compare durations only when both known start and end
+            dates match; two unknown periods do not establish alignment.
+
         Example:
             >>> company = Company('AAPL')
             >>> financials = company.get_financials()
             >>> metrics = financials.get_financial_metrics()
             >>> print(f"Revenue: ${metrics.get('revenue', 'N/A'):,}")
+            >>> metrics = financials.get_financial_metrics(include_periods=True)
+            >>> print(metrics['revenue'], metrics['periods']['revenue'])
         """
         # Every getter below funnels into _render_statement_frame(), which without
         # this memo re-rendered and re-converted the same three statements once per
@@ -1254,9 +1304,81 @@ class Financials:
         # outlives the call that produced it.
         self._statement_frame_memo = {}
         try:
-            return self._collect_financial_metrics()
+            metrics = self._collect_financial_metrics()
+            if include_periods:
+                metrics['periods'] = self._collect_metric_periods(metrics)
+            return metrics
         finally:
             self._statement_frame_memo = None
+
+    def _collect_metric_periods(self, metrics: Dict[str, Any]) -> Dict[str, Any]:
+        """Describe the same source frames already used by this metrics call."""
+        periods = dict.fromkeys(metrics)
+
+        def native(name):
+            return (getattr(getattr(self, name, None), '__func__', None)
+                    is getattr(Financials, name))
+
+        # A populated frame does not establish the source of an overridden
+        # numeric route; keep its available values and report unknown periods.
+        common_routes = (
+            '_collect_financial_metrics', '_render_statement_frame',
+            '_get_standardized_concept_by_xbrl',
+            '_get_standardized_concept_value', '_get_concept_value',
+        )
+        if not all(native(name) for name in common_routes):
+            return periods
+
+        extra_routes = {
+            'revenue': ('_get_revenue', '_filed_total_for_statement_period'),
+            'net_income': ('_noncontrolling_interest_share',),
+        }
+
+        def native_primitive(name):
+            return (native('get_' + name)
+                    and all(native(route) for route in extra_routes.get(name, ())))
+
+        groups = {
+            'income': ('revenue', 'operating_income', 'net_income',
+                       'shares_outstanding_basic', 'shares_outstanding_diluted'),
+            'balance': ('total_assets', 'total_liabilities', 'stockholders_equity',
+                        'current_assets', 'current_liabilities'),
+            'cashflow': ('operating_cash_flow', 'capital_expenditures'),
+        }
+        memo = self._statement_frame_memo or {}
+        for statement_type, names in groups.items():
+            eligible = [name for name in names if metrics[name] is not None and native_primitive(name)]
+            if not eligible:
+                continue
+            frame = memo.get(statement_type)
+            if frame is None:
+                continue
+            rendered, df = frame
+            if df is None or df.empty:
+                continue
+            try:
+                column = _select_period_column(rendered, df)
+                descriptor = None if column is None else _period_descriptor(rendered, column)
+            except Exception as exc:
+                log.debug(f"Error resolving {statement_type} metric period: {exc}")
+                continue
+            if descriptor is not None:
+                for name in eligible:
+                    periods[name] = descriptor.copy()
+
+        derived = (
+            ('free_cash_flow', 'operating_cash_flow', 'capital_expenditures', 'duration'),
+            ('current_ratio', 'current_assets', 'current_liabilities', 'instant'),
+            ('debt_to_assets', 'total_liabilities', 'total_assets', 'instant'),
+        )
+        for name, left, right, period_type in derived:
+            if name == 'free_cash_flow' and not native('get_free_cash_flow'):
+                continue
+            known = periods[left]
+            if (metrics[name] is not None and known is not None
+                    and known['period_type'] == period_type and known == periods[right]):
+                periods[name] = known.copy()
+        return periods
 
     def _collect_financial_metrics(self) -> Dict[str, Any]:
         """The body of get_financial_metrics(), run with the per-call memo installed."""
@@ -1397,7 +1519,7 @@ class Financials:
             "  financials.get_free_cash_flow()",
             "",
             "ALL METRICS:",
-            "  financials.get_financial_metrics()  # Dict with 14 metrics + ratios",
+            "  financials.get_financial_metrics(include_periods=True)  # 15 metrics + source periods",
         ]
 
         return "\n".join(lines)

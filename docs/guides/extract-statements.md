@@ -275,6 +275,41 @@ print(f"Free Cash Flow: ${metrics['free_cash_flow']:,.0f}")
 
 `debt_to_assets` is **total liabilities divided by total assets**, as a fraction (Apple's fiscal 2023 balance sheet gives 290,437 / 352,583 = 0.82). Total liabilities include operating payables, deferred revenue, lease and tax liabilities, so the figure is higher than a ratio of borrowings alone (Apple's commercial paper and term debt are about 0.32 of assets).
 
+### Check Each Metric's Period
+
+`get_financial_metrics()` returns 15 scalar values, each a number or `None`. Pass the keyword-only option `include_periods=True` to add a `periods` dictionary with the same 15 metric names. The scalar values and their selection stay unchanged.
+
+```python
+metrics = financials.get_financial_metrics(include_periods=True)
+
+for name in ("revenue", "operating_cash_flow", "free_cash_flow", "total_assets"):
+    print(name, metrics[name], metrics["periods"][name])
+```
+
+For Apple's Q3 FY2023 10-Q (accession `0000320193-23-000077`), this prints:
+
+```text
+revenue 81797000000.0 {'period_type': 'duration', 'start_date': '2023-04-02', 'end_date': '2023-07-01'}
+operating_cash_flow 88945000000.0 {'period_type': 'duration', 'start_date': '2022-09-25', 'end_date': '2023-07-01'}
+free_cash_flow 80149000000.0 {'period_type': 'duration', 'start_date': '2022-09-25', 'end_date': '2023-07-01'}
+total_assets 335038000000.0 {'period_type': 'instant', 'start_date': None, 'end_date': '2023-07-01'}
+```
+
+The dates describe the exact source period selected for each value. Income and cash-flow metrics can cover different durations in the same filing: here, revenue covers the quarter and cash flow covers nine months. This option exposes those periods; it does not align them, derive quarterly cash flow, or annualize values. Matching end dates alone do not establish matching durations. Before combining values, also check their entity, currency, units and definitions.
+
+| Source or calculation | Metric names |
+|-----------------------|--------------|
+| Income statement duration | `revenue`, `operating_income`, `net_income`, `shares_outstanding_basic`, `shares_outstanding_diluted` |
+| Balance-sheet instant | `total_assets`, `total_liabilities`, `stockholders_equity`, `current_assets`, `current_liabilities` |
+| Cash-flow duration | `operating_cash_flow`, `capital_expenditures` |
+| Operating cash flow minus absolute capital expenditures | `free_cash_flow` |
+| Current assets / current liabilities | `current_ratio` |
+| Total liabilities / total assets | `debt_to_assets` |
+
+Dates use ISO `YYYY-MM-DD` strings. An instant has `start_date: None`. An unavailable metric has both value and period `None`; an available value with missing, invalid or ambiguous period metadata keeps its value and has period `None`. A value supplied by a custom getter without an established source period also has period `None`. Numeric zero remains zero.
+
+Free cash flow receives a period only when its two operands have the same known duration. The two ratios receive a period only when their operands have the same known instant. Unknown or mismatched periods affect metadata alone. Built-in free cash flow keeps its cash-flow duration even when revenue covers a different duration.
+
 ### Cross-Company Analysis Made Simple
 
 Now comparing multiple companies is trivial:

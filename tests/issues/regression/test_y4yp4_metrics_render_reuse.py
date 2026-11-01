@@ -116,8 +116,9 @@ def work_counter(monkeypatch):
     return calls
 
 
-def test_one_metrics_call_renders_each_statement_once(aapl, work_counter):
-    aapl.get_financial_metrics()
+@pytest.mark.parametrize('include_periods', [False, True])
+def test_one_metrics_call_renders_each_statement_once(aapl, work_counter, include_periods):
+    aapl.get_financial_metrics(include_periods=include_periods)
 
     assert len(work_counter['render']) == 3, \
         f"expected 3 renders, got {len(work_counter['render'])}"
@@ -125,49 +126,55 @@ def test_one_metrics_call_renders_each_statement_once(aapl, work_counter):
     assert len(set(work_counter['render'])) == 3, "the three must be distinct statements"
 
 
-def test_a_bank_with_more_missing_metrics_also_renders_three(jpm, work_counter):
+@pytest.mark.parametrize('include_periods', [False, True])
+def test_a_bank_with_more_missing_metrics_also_renders_three(jpm, work_counter, include_periods):
     """JPMorgan took 18 renders: a getter that finds nothing still did the work."""
-    jpm.get_financial_metrics()
+    jpm.get_financial_metrics(include_periods=include_periods)
     assert len(work_counter['render']) == 3
     assert len(work_counter['to_dataframe']) == 3
 
 
-def test_every_metric_value_is_unchanged(aapl):
-    metrics = aapl.get_financial_metrics()
+@pytest.mark.parametrize('include_periods', [False, True])
+def test_every_metric_value_is_unchanged(aapl, include_periods):
+    metrics = aapl.get_financial_metrics(include_periods=include_periods)
     for name, expected in AAPL_METRICS.items():
         assert metrics[name] == expected, name
     assert metrics['current_ratio'] == pytest.approx(0.988012, abs=1e-6)
     assert metrics['debt_to_assets'] == pytest.approx(0.823741, abs=1e-6)
 
 
-def test_metrics_that_are_legitimately_absent_stay_absent(jpm):
+@pytest.mark.parametrize('include_periods', [False, True])
+def test_metrics_that_are_legitimately_absent_stay_absent(jpm, include_periods):
     """The failure mode a shared frame invites: a missing metric silently
     acquiring another statement's number."""
-    metrics = jpm.get_financial_metrics()
+    metrics = jpm.get_financial_metrics(include_periods=include_periods)
     for name in JPM_NONE_METRICS:
         assert metrics[name] is None, f"{name} should be None for this filer"
     for name, expected in JPM_VALUES.items():
         assert metrics[name] == expected, name
 
 
-def test_the_memo_does_not_outlive_the_call(aapl, work_counter):
+@pytest.mark.parametrize('include_periods', [False, True])
+def test_the_memo_does_not_outlive_the_call(aapl, work_counter, include_periods):
     """A second call must do the work again, not reuse the first call's rendering."""
-    aapl.get_financial_metrics()
+    aapl.get_financial_metrics(include_periods=include_periods)
     first = len(work_counter['render'])
-    aapl.get_financial_metrics()
+    aapl.get_financial_metrics(include_periods=include_periods)
     second = len(work_counter['render']) - first
 
     assert first == 3
     assert second == 3, "a later call reused a rendering from an earlier one"
 
 
-def test_the_memo_is_absent_outside_a_metrics_call(aapl):
+@pytest.mark.parametrize('include_periods', [False, True])
+def test_the_memo_is_absent_outside_a_metrics_call(aapl, include_periods):
     assert aapl._statement_frame_memo is None
-    aapl.get_financial_metrics()
+    aapl.get_financial_metrics(include_periods=include_periods)
     assert aapl._statement_frame_memo is None
 
 
-def test_the_memo_is_discarded_when_a_getter_raises(aapl, monkeypatch):
+@pytest.mark.parametrize('include_periods', [False, True])
+def test_the_memo_is_discarded_when_a_getter_raises(aapl, monkeypatch, include_periods):
     """Left installed, it would leak a stale rendering into every later call."""
     class Boom(Exception):
         pass
@@ -177,7 +184,7 @@ def test_the_memo_is_discarded_when_a_getter_raises(aapl, monkeypatch):
 
     monkeypatch.setattr(Financials, 'get_revenue', explode)
     with pytest.raises(Boom):
-        aapl.get_financial_metrics()
+        aapl.get_financial_metrics(include_periods=include_periods)
     assert aapl._statement_frame_memo is None
 
 
